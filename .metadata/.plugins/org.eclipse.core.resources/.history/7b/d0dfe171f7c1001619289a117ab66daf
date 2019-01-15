@@ -1,0 +1,61 @@
+package com.UI.Admin;
+
+import java.awt.GridLayout;
+
+import javax.swing.*;
+
+import com.DAL.*;
+
+public class QueryAcademy extends JFrame {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 690401179368029719L;
+	//添加学院服务类
+	AcademyService as = new AcademyService();
+	public void init() {
+		/**
+		 * 创建对象
+		 */
+		//窗体
+		JFrame addAcademy = new JFrame();
+		//标签
+		JLabel lblMessage = new JLabel("添加学院信息");
+		JLabel lblAcademyName = new JLabel("学院名称：");
+		//文本框
+		JTextField txtAcademyName = new JTextField();
+		//按钮
+		JButton btnAddAcademyInfo = new JButton("添加");
+		JButton btnClear = new JButton("清除");
+		
+		/**
+		 * 设置对象属性
+		 */
+		addAcademy.setSize(500, 400);
+		//居中显示窗体
+		addAcademy.setLocation(650, 300);
+		//改变布局
+		addAcademy.setLayout(new GridLayout(4,4));
+		//禁止改变窗口大小
+		addAcademy.setResizable(false);
+		//大小
+		btnAddAcademyInfo.setSize(100, 30);
+		btnClear.setSize(100, 30);
+		//位置
+		btnAddAcademyInfo.setLocation(100, 50);
+		btnClear.setLocation(100, 100);
+		
+		/**
+		 * 对象添加到窗体中
+		 */
+		addAcademy.add(lblMessage);
+		addAcademy.add(lblAcademyName);
+		addAcademy.add(txtAcademyName);
+		addAcademy.add(btnAddAcademyInfo);
+		addAcademy.add(btnClear);
+		
+		//显示
+		addAcademy.setVisible(true);
+	}
+}

@@ -1,0 +1,101 @@
+package com.UI.Admin;
+
+
+@SuppressWarnings("serial")
+public class CourseGradeInfo extends JFrame implements ItemListener, ActionListener{
+	private static CourseGradeInfo instance;
+
+	public static CourseGradeInfo getInstance(){
+		if(instance == null){
+			instance = new CourseGradeInfo();
+		}
+		return instance;
+	}
+	
+	private CourseGradeInfo(){
+		init();
+		List<String> stuList = ts.getAllTeachingCourseName(LoginForm.currentUserId);
+		if(stuList != null){
+			bindDataToCombo(cbb, stuList);
+			//绑定数据
+			prepare(this.cbb.getSelectedItem().toString());
+		}
+	}
+
+	ChooseCourseService cs = new ChooseCourseService();
+	TeacherTeachingService ts = new TeacherTeachingService();
+	
+	JButton btnModefy, btnAdd, btnDelete, btnClear = null;
+
+	JComboBox<String> cbb = null;
+	JTable tStudent = null;
+	JScrollPane sp_Student = null;
+			
+	public void init() {
+		//创建对象
+		cbb = new JComboBox<String>();
+		tStudent = new JTable();
+		sp_Student = new JScrollPane();
+		btnModefy = new JButton("修改");
+		btnAdd = new JButton("添加");
+		btnDelete = new JButton("删除");
+		btnClear = new JButton("清空");
+		
+		//设置属性
+		this.setTitle("录入学生成绩");
+		this.setSize(550, 550);
+		this.setLocation(650, 300);
+		this.setLayout(new FlowLayout());
+		cbb.addItemListener(this);
+		btnModefy.addActionListener(this);
+		btnAdd.addActionListener(this);
+		btnDelete.addActionListener(this);
+		btnClear.addActionListener(this);
+		
+		//添加
+		this.add(cbb);
+		sp_Student.add(tStudent);
+		this.add(sp_Student);
+		this.add(btnAdd);
+		this.add(btnModefy);
+		this.add(btnDelete);
+		this.add(btnClear);
+		this.setVisible(true);
+	}
+	
+	//绑定数据到JComboBox
+	private void bindDataToCombo(JComboBox<String> obj, List<String> courseList){
+		for(int i=0;i<courseList.size();i++){
+			obj.addItem(courseList.get(i));
+		}
+	}
+	
+	//设置表格数据
+	private void prepare(String courseName){
+		DefaultTableModel dtm = cs.getStudentListModelByCourseName(courseName);
+		tStudent.setModel(dtm);
+		sp_Student.setViewportView(tStudent);
+		tStudent.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		String s = e.getItem().toString();
+		if(s != null){
+			prepare(s);
+		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == btnAdd){
+			
+		}else if(e.getSource() == btnModefy){
+			
+		}else if(e.getSource() == btnDelete){
+			
+		}else if(e.getSource() == btnClear){
+			
+		}
+	}
+}

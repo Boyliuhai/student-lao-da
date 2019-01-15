@@ -1,0 +1,119 @@
+package com.UI.Admin;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+import com.DAL.UserService;
+
+@SuppressWarnings("serial")
+public class LoginForm extends JFrame implements ActionListener {
+	private static LoginForm instance = null;
+	
+	private LoginForm(){
+		init();
+	}
+	
+	public static LoginForm getInstance(){
+		if(instance == null){
+			instance = new LoginForm();
+		}
+		return instance;
+	}
+	
+	/**
+	 * 静态变量，保存用户的状态信息
+	 */
+	public static String currentUser = null;
+	public static int role = 0;
+	
+	//定义全局变量
+	JButton btnLogin = null;
+	JButton btnCancel = null;
+	JTextField txtUserName = null;
+	JTextField txtPassword = null;
+	JRadioButton rbTeacher = null;
+	JRadioButton rbStudent = null;
+	JRadioButton rbAdmin  = null;
+
+	UserService us = new UserService();
+	
+	public void init(){
+		//创建对象
+		JPanel p1 = new JPanel(new FlowLayout());
+		JLabel lblName = new JLabel("用户名:");
+		txtUserName = new JTextField(10);
+		JPanel p2 = new JPanel(new FlowLayout());
+		JLabel lblPassword = new JLabel("密      码:");
+		txtPassword = new JTextField(10);
+		JPanel p3 = new JPanel(new FlowLayout());
+		btnLogin = new JButton("登陆");
+		btnCancel = new JButton("清空");
+		ButtonGroup bg = new ButtonGroup();
+		JPanel p4 = new JPanel();
+		rbTeacher = new JRadioButton("教师");
+		rbStudent = new JRadioButton("学生");
+		rbAdmin = new JRadioButton("管理员");
+		
+		//设置对象的属性
+		this.setTitle("登录 ");
+		this.setSize(300,250);
+		this.setLayout(new GridLayout(4,1));
+		this.setLocation(new Point(600,200));
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		btnLogin.addActionListener(this);
+		btnCancel.addActionListener(this);
+		txtUserName.setText("张玲");
+		txtPassword.setText("123456");
+		rbStudent.setSelected(true);
+		
+		//添加对象到窗体中
+		p1.add(lblName);
+		p1.add(txtUserName);
+		p2.add(lblPassword);
+		p2.add(txtPassword);
+		p3.add(btnLogin);
+		p3.add(btnCancel);
+		this.add(p1);
+		this.add(p2);
+		this.add(p4);
+		bg.add(rbAdmin);
+		bg.add(rbTeacher);
+		bg.add(rbStudent);
+		p4.add(rbAdmin);
+		p4.add(rbTeacher);
+		p4.add(rbStudent);
+		this.add(p3);
+	}
+	
+	//事件处理
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == btnLogin){
+			//获取用户输入的凭证
+			String username = txtUserName.getText().trim();
+			String password = txtPassword.getText().trim();
+			
+			String ps = us.QueryUserReturnPassword(username).trim();
+			currentUser = username;//获取当前用户
+			role = us.QueryForUserPower(currentUser);//获取用户权限
+			//密码相同
+			if(ps!="" && ps.equals(password)){
+				//对应用户的权限
+				if((rbAdmin.isSelected() && role == 1) || 
+						(rbTeacher.isSelected() && role == 2) || 
+						(rbStudent.isSelected() && role == 3)){
+					this.dispose();
+					new QuestionDialog(this, "提示信息", "登陆成功！ " + currentUser + "，欢迎您！");
+				}else{
+					new QuestionDialog(this, "提示信息", "您输入的信息有误，请重新输入!");
+				}
+			}else{
+				new QuestionDialog(this, "提示信息", "您输入的信息有误，请重新输入!");
+			}
+		}else if(e.getSource() == btnCancel){
+			txtUserName.setText("");
+			txtPassword.setText("");
+		}
+	}
+}

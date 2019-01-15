@@ -1,0 +1,43 @@
+package com.UI.Admin;
+
+import java.awt.GridLayout;
+import java.util.List;
+
+import javax.swing.*;
+
+import com.DAL.CourseService;
+
+@SuppressWarnings("serial")
+public class CourseGradeInfo extends JFrame {
+	CourseService cs = new CourseService();
+	
+	public void init() {
+		//创建对象
+		JButton btnAddAcademyInfo = new JButton("添加");
+		JButton btnClear = new JButton("清除");
+		
+		//设置属性
+		this.setTitle("录入学生成绩");
+		this.setSize(500, 400);
+		this.setLocation(650, 300);
+		this.setLayout(new GridLayout(4,4));
+		this.setResizable(false);
+		btnAddAcademyInfo.setSize(100, 30);
+		btnClear.setSize(100, 30);
+		btnAddAcademyInfo.setLocation(100, 50);
+		btnClear.setLocation(100, 100);
+		
+	
+		
+		//添加
+		this.add(btnClear);
+	}
+	
+	//显示JComboBox中的内容
+	private void bindDataToCombo(JComboBox<String> obj){
+		List<String> lists = cs.getAllAcademyNames();
+		for(int i=0;i<lists.size();i++){
+			obj.addItem(lists.get(i));
+		}
+	}
+}

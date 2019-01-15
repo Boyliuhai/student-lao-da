@@ -1,0 +1,211 @@
+package com.UI.Admin;
+
+import java.awt.event.*;
+import javax.swing.*;
+
+@SuppressWarnings("serial")
+public class MainForm extends JFrame implements ActionListener {
+	//初始化时需要创建的页面
+	StudentBasicInfoForm studentBasicInfoForm = null;
+	
+	public MainForm(){
+		init();
+		this.setVisible(true);
+		studentBasicInfoForm = new StudentBasicInfoForm();
+	}
+	
+	//添加全局变量
+	JMenuBar mb = null;
+	JMenu m1 = null;
+	JMenu mStudent = null;
+	JMenu m3 = null;
+	JMenu m4 = null;
+	JMenu mScore = null;
+	JMenu m5 = null;
+	JMenuItem miQueryAcademyInfo = null;
+	JMenuItem miInsertAcademyInfo = null;
+	JMenuItem miModefyAcademyInfo = null;
+	JMenuItem miDeleteAcademyInfo = null;
+	JMenuItem miQueryStudentInfo = null;
+	JMenuItem miInsertStudentInfo = null;
+	JMenuItem miModefyStudentInfo = null;
+	JMenuItem miDeleteStudentInfo = null;
+	JMenuItem miQueryTeacherInfo = null;
+	JMenuItem miInsertTeacherInfo = null;
+	JMenuItem miModefyTeacherInfo = null;
+	JMenuItem miDeleteTeacherInfo = null;
+	JMenuItem miQueryCourseInfo = null;
+	JMenuItem miInsertCourseInfo = null;
+	JMenuItem miModefyCourseInfo = null;
+	JMenuItem miDeleteCourseInfo = null;
+	JMenuItem miQueryScoreInfo = null;
+	JMenuItem miInsertScoreInfo = null;
+	JMenuItem miModefyScoreInfo = null;
+	JMenuItem miDeleteScoreInfo = null;
+	JMenuItem miLogin = null;
+	JMenuItem miLogOut = null;
+	JMenuItem miExit = null;
+	JMenuItem miModefyPassword = null;
+	JMenuItem miChooseCourse = null;
+	
+	public void init(){
+		//创建对象
+		mb = new JMenuBar();
+		m1 = new JMenu("学院信息管理");
+		mStudent = new JMenu("学生信息管理");
+		m3 = new JMenu("教师信息管理");
+		m4 = new JMenu("课程信息管理");
+		mScore = new JMenu("成绩信息管理");
+		m5 = new JMenu("个人操作");
+		
+		miQueryAcademyInfo = new JMenuItem("查询学院信息");
+		miInsertAcademyInfo = new JMenuItem("插入学院信息");
+		miModefyAcademyInfo = new JMenuItem("修改学院信息");
+		miDeleteAcademyInfo = new JMenuItem("删除学院信息");
+		miQueryStudentInfo = new JMenuItem("查询学生信息");
+		miInsertStudentInfo = new JMenuItem("插入学生信息");
+		miModefyStudentInfo = new JMenuItem("修改学生信息");
+		miDeleteStudentInfo = new JMenuItem("删除学员信息");
+		miQueryTeacherInfo = new JMenuItem("查询教师信息");
+		miInsertTeacherInfo = new JMenuItem("插入教师信息");
+		miModefyTeacherInfo = new JMenuItem("修改教师信息");
+		miDeleteTeacherInfo = new JMenuItem("删除教师信息");
+		miQueryCourseInfo = new JMenuItem("查询课程信息");
+		miInsertCourseInfo = new JMenuItem("添加课程信息");
+		miModefyCourseInfo = new JMenuItem("修改课程信息");
+		miDeleteCourseInfo = new JMenuItem("删除课程信息");
+		miQueryScoreInfo = new JMenuItem("查询成绩信息");
+		miInsertScoreInfo = new JMenuItem("添加成绩信息");
+		miModefyScoreInfo = new JMenuItem("修改成绩信息");
+		miDeleteScoreInfo = new JMenuItem("删除成绩信息");
+		miChooseCourse = new JMenuItem("学生选课");//学生选课
+		miLogin = new JMenuItem("登录");
+		miLogOut = new JMenuItem("注销");
+		miExit = new JMenuItem("退出");
+		miModefyPassword = new JMenuItem("修改密码");
+		
+		//设置对象属性
+		this.setTitle("管理员信息管理");
+		this.setSize(600, 500);
+		this.setLocation(500, 200);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		miQueryAcademyInfo.addActionListener(this);
+		miInsertAcademyInfo.addActionListener(this);
+		miModefyAcademyInfo.addActionListener(this);
+		miDeleteAcademyInfo.addActionListener(this);
+		miQueryStudentInfo.addActionListener(this);
+		miInsertStudentInfo.addActionListener(this);
+		miModefyStudentInfo.addActionListener(this);
+		miDeleteStudentInfo.addActionListener(this);
+		miQueryTeacherInfo.addActionListener(this);
+		miInsertTeacherInfo.addActionListener(this);
+		miModefyTeacherInfo.addActionListener(this);
+		miDeleteTeacherInfo.addActionListener(this);
+		miQueryCourseInfo.addActionListener(this);
+		miInsertCourseInfo.addActionListener(this);
+		miModefyCourseInfo.addActionListener(this);
+		miDeleteCourseInfo.addActionListener(this);
+		miLogin.addActionListener(this);
+		miLogOut.addActionListener(this);
+		miExit.addActionListener(this);
+		miModefyPassword.addActionListener(this);
+		miChooseCourse.addActionListener(this);
+		
+		//添加
+		m1.add(miQueryAcademyInfo);
+		m1.add(miInsertAcademyInfo);
+		m1.add(miModefyAcademyInfo);
+		m1.add(miDeleteAcademyInfo);
+		mStudent.add(miQueryStudentInfo);
+		mStudent.add(miInsertStudentInfo);
+		mStudent.add(miModefyStudentInfo);
+		mStudent.add(miDeleteStudentInfo);
+		mStudent.add(miChooseCourse);
+		m3.add(miQueryTeacherInfo);
+		m3.add(miInsertTeacherInfo);
+		m3.add(miModefyTeacherInfo);
+		m3.add(miDeleteTeacherInfo);
+		m4.add(miQueryCourseInfo);
+		m4.add(miInsertCourseInfo);
+		m4.add(miModefyCourseInfo);
+		m4.add(miDeleteCourseInfo);
+		m5.add(miLogin);
+		m5.add(miLogOut);
+		m5.add(miExit);
+		m5.add(miModefyPassword);
+		mScore.add(miQueryScoreInfo);
+		mScore.add(miInsertScoreInfo);
+		mScore.add(miModefyScoreInfo);
+		mScore.add(miDeleteScoreInfo);
+		mb.add(m1);
+		mb.add(mStudent);
+		mb.add(m3);
+		mb.add(m4);
+		mb.add(mScore);
+		mb.add(m5);
+		this.setJMenuBar(mb);
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == miLogin){
+			LoginForm.getInstance().setVisible(true);
+		}else if(e.getSource() == miExit){
+			//退出提示
+			int result = QuestionDialog.ShowDialog(this, "退出提示", "真的要退出吗？");
+			if(result == QuestionDialog.Dialog_OK){
+				System.exit(0);
+			}else{
+				//qd.dispose();
+			}
+		}else if(LoginForm.currentUser == null){
+			int dialog_result = new QuestionDialog(this, 
+					"登录提示", "您还没有登录奥，请先登录！").Dialog_Result;
+			if(dialog_result == QuestionDialog.Dialog_OK){
+				LoginForm.getInstance().setVisible(true);
+			}
+		}else if(e.getSource() == miQueryAcademyInfo){
+			new AcademyManagement();
+		}else if(e.getSource() == miInsertStudentInfo){
+			studentBasicInfoForm.clear();
+			controlButtonDisplay(true, false, false, true);
+			studentBasicInfoForm.setVisible(true);
+		}else if(e.getSource() == miQueryStudentInfo){
+			controlButtonDisplay(false, false, false, false);			
+			StuIDInput.getInstance().setVisible(true);
+		}else if(e.getSource() == miModefyStudentInfo){
+			controlButtonDisplay(false, false, true, true);
+			StuIDInput.getInstance().setVisible(true);
+		}else if(e.getSource() == miDeleteStudentInfo){
+			controlButtonDisplay(false, true, false, true);
+			StuIDInput.getInstance().setVisible(true);
+		}else if(e.getSource() == miLogOut){
+			LoginForm.currentUser = null;
+			LoginForm.role=0;
+			new QuestionDialog(this, "注销提示", "注销成功！欢迎下次登录！");
+		}else if(e.getSource() == miModefyPassword){
+			new ModefyPassword();
+		}else if(e.getSource() == miChooseCourse){
+			//只有学生才能进入选课页面
+			if(LoginForm.role == 3){
+				new StuSelectCourseForm();
+			}else{
+				new QuestionDialog(this, "提示", "抱歉，只有学生可以查看选课页面！");
+			}
+		}
+	}
+	
+	//控制控件的显示
+	private void controlButtonDisplay(boolean b, boolean c, boolean d, boolean e) {
+		studentBasicInfoForm.btnAdd.setVisible(b);
+		studentBasicInfoForm.btnDelete.setVisible(c);
+		studentBasicInfoForm.btnModefy.setVisible(d);
+		studentBasicInfoForm.btnClear.setVisible(e);
+	}
+
+	public static void main(String[] args) {
+		new MainForm();
+	}
+
+}

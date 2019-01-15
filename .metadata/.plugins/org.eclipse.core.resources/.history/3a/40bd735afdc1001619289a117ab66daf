@@ -1,0 +1,133 @@
+package com.UI.Admin;
+
+import java.awt.event.*;
+import javax.swing.*;
+
+@SuppressWarnings("serial")
+public class AdminHome2 extends JFrame implements ActionListener {
+	//添加全局变量
+	JMenuBar mb = null;
+	JMenu m = null;
+	JMenu m1 = null;
+	JMenu m2 = null;
+	JMenu m3 = null;
+	JMenu m4 = null;
+	JMenu m5 = null;
+	JMenuItem mi11 = null;
+	JMenuItem mi12 = null;
+	JMenuItem mi13 = null;
+	JMenuItem mi14 = null;
+	JMenuItem mi21 = null;
+	JMenuItem mi22 = null;
+	JMenuItem mi23 = null;
+	JMenuItem mi24 = null;
+	JMenuItem mi31 = null;
+	JMenuItem mi32 = null;
+	JMenuItem mi33 = null;
+	JMenuItem mi34 = null;
+	JMenuItem mi41 = null;
+	JMenuItem mi42 = null;
+	JMenuItem mi43 = null;
+	JMenuItem mi44 = null;
+	
+	public void init(){
+		//创建对象
+		mb = new JMenuBar();
+		m1 = new JMenu("学院信息管理");
+		m2 = new JMenu("学生信息管理");
+		m3 = new JMenu("教师信息管理");
+		m4 = new JMenu("课程信息管理");
+		m5 = new JMenu("修改密码");
+		
+		mi11 = new JMenuItem("查询学院信息");
+		mi12 = new JMenuItem("插入学院信息");
+		mi13 = new JMenuItem("修改学院信息");
+		mi14 = new JMenuItem("删除学院信息");
+		mi21 = new JMenuItem("查询学生信息");
+		mi22 = new JMenuItem("插入学生信息");
+		mi23 = new JMenuItem("修改学生信息");
+		mi24 = new JMenuItem("删除学员信息");
+		mi31 = new JMenuItem("查询教师信息");
+		mi32 = new JMenuItem("插入教师信息");
+		mi33 = new JMenuItem("修改教师信息");
+		mi34 = new JMenuItem("删除教师信息");
+		mi41 = new JMenuItem("查询课程信息");
+		mi42 = new JMenuItem("添加课程信息");
+		mi43 = new JMenuItem("修改课程信息");
+		mi44 = new JMenuItem("删除课程信息");
+		
+		//设置对象属性
+		this.setTitle("管理员信息管理");
+		this.setSize(600, 500);
+		this.setLocation(500, 200);
+		
+		//添加
+		m1.add(mi11);
+		m1.add(mi12);
+		m1.add(mi13);
+		m1.add(mi14);
+		m2.add(mi21);
+		m2.add(mi22);
+		m2.add(mi23);
+		m2.add(mi24);
+		m3.add(mi31);
+		m3.add(mi32);
+		m3.add(mi33);
+		m3.add(mi34);
+		m4.add(mi41);
+		m4.add(mi42);
+		m4.add(mi43);
+		m4.add(mi44);
+		mb.add(m1);
+		mb.add(m2);
+		mb.add(m3);
+		mb.add(m4);
+		mb.add(m5);
+		this.setJMenuBar(mb);
+	}
+	
+	public AdminHome2(){
+		init();
+		this.setVisible(true);
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == mi11){
+			new QueryAcademy();
+		}else if(e.getSource() == mi12){
+			new 
+		}else if(e.getSource() == mi13){
+			
+		}else if(e.getSource() == mi14){
+			
+		}else if(e.getSource() == mi21){
+			
+		}else if(e.getSource() == mi22){
+			
+		}else if(e.getSource() == mi23){
+			
+		}else if(e.getSource() == mi24){
+			
+		}else if(e.getSource() == mi31){
+			
+		}else if(e.getSource() == mi32){
+			
+		}else if(e.getSource() == mi33){
+			
+		}else if(e.getSource() == mi34){
+			
+		}else if(e.getSource() == mi41){
+			
+		}else if(e.getSource() == mi42){
+			
+		}else if(e.getSource() == mi43){
+			
+		}else if(e.getSource() == mi44){
+			
+		}else if(e.getSource() == m5){
+			
+		}
+	}
+
+}

@@ -1,0 +1,86 @@
+package com.DAL;
+import java.sql.*;
+
+import com.Dao.*;
+
+public class UserService {
+	
+	/**
+	 * 查询单个学院信息
+	 * @param id
+	 * @return Academy
+	 */
+	public Academy QueryAcademy(String username) {
+		String sql = "select Password from User where UserName=?";
+		Connection conn = SQLHelper.getConnection();
+		String password = "";
+		Academy academy = new Academy();
+		try{
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, username);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()){
+				password = rs.getString(1);
+			}
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}
+		return password;
+	}
+	/**
+	 * 插入学院信息
+	 * @param academy
+	 * @return boolean
+	 */
+	public boolean AddAcademy(Academy academy) {
+		String sql = "insert into Academy(AcademyId,Name) values(?,?)";
+		Connection conn = SQLHelper.getConnection();
+		try{
+			PreparedStatement statement = conn.prepareStatement(sql);
+			statement.setInt(0, academy.getAcademyId());
+			statement.setString(1, academy.getName());
+			statement.executeUpdate();
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}
+		return true;
+	}
+
+	/**
+	 * 修改学院信息
+	 * @param academy
+	 * @return boolean
+	 */
+	public boolean ModefyAcademy(Academy academy) {
+		String sql = "Update Academy set Name=? where AcademyId=?";
+		Connection conn = SQLHelper.getConnection();
+		try{
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, academy.getName());
+			ps.setInt(2, academy.getAcademyId());
+			ps.executeUpdate();
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}
+		return true;
+	}
+
+	
+	/**
+	 * 删除指定编号的学院信息
+	 * @param academyId
+	 * @return boolean
+	 */
+	public boolean DeleteAcademy(int academyId) {
+		String sql = "Delete from Academy where AcademyId=?";
+		Connection conn = SQLHelper.getConnection();
+		try{
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, academyId);
+			ps.executeUpdate();
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}
+		return true;
+	}
+}

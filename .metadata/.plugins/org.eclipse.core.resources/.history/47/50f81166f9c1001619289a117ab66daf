@@ -1,0 +1,111 @@
+package com.UI.Admin;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+import com.DAL.UserService;
+
+@SuppressWarnings("serial")
+public class LoginUI extends JFrame implements ActionListener {
+	//定义全局变量
+	JButton btnLogin = null;
+	JButton btnCancel = null;
+	JTextField txtUserName = null;
+	JTextField txtPassword = null;
+	JRadioButton rbTeacher = null;
+	JRadioButton rbStudent = null;
+	JRadioButton rbAdmin  = null;
+	JFrame login = null;
+
+	UserService us = new UserService();
+	
+	public void init(){
+		/**
+		 * 创建对象
+		 */
+		login = new JFrame("登陆界面");
+		JPanel p1 = new JPanel(new FlowLayout());
+		JLabel lblName = new JLabel("用户名:");
+		txtUserName = new JTextField(10);
+		JPanel p2 = new JPanel(new FlowLayout());
+		JLabel lblPassword = new JLabel("密      码:");
+		txtPassword = new JTextField(10);
+		JPanel p3 = new JPanel(new FlowLayout());
+		btnLogin = new JButton("登陆");
+		btnCancel = new JButton("注销");
+		ButtonGroup bg = new ButtonGroup();
+		JPanel p4 = new JPanel();
+		rbTeacher = new JRadioButton("教师");
+		rbStudent = new JRadioButton("学生");
+		rbAdmin = new JRadioButton("管理员");
+		
+		/**
+		 * 设置对象的属性
+		 */
+		login.setSize(300,250);
+		login.setLayout(new GridLayout(4,1));
+		login.setLocation(new Point(600,200));
+		login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		btnLogin.addActionListener(this);
+		btnCancel.addActionListener(this);
+		
+		/**
+		 * 添加到窗体中
+		 */
+		p1.add(lblName);
+		p1.add(txtUserName);
+		p2.add(lblPassword);
+		p2.add(txtPassword);
+		p3.add(btnLogin);
+		p3.add(btnCancel);
+		login.add(p1);
+		login.add(p2);
+		login.add(p4);
+		bg.add(rbAdmin);
+		bg.add(rbTeacher);
+		bg.add(rbStudent);
+		p4.add(rbAdmin);
+		p4.add(rbTeacher);
+		p4.add(rbStudent);
+		login.add(p3);
+		
+		login.setVisible(true);
+	}
+	
+	public LoginUI(){
+		init();
+	}
+	
+	public static void main(String[] args) {
+		new LoginUI();
+	}
+
+	/**
+	 * 事件处理
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == btnLogin){
+			if(rbAdmin.isSelected()){
+				if(us.QueryUserReturnPassword(txtUserName.getText()) == txtUserName.getText()){
+					
+				}
+				
+				//登陆页面退出
+				login.dispose();
+				//显示管理员Home页面
+				new AdminHome2();
+			}else if(rbTeacher.isSelected()){
+				new StudentHome();
+			}else if(rbStudent.isSelected()){
+				new TeacherHome();
+			}
+		}else if(e.getSource() == btnCancel){
+			txtUserName.setText("");
+			txtPassword.setText("");
+			//退出应用
+			System.exit(0);
+		}
+	}
+}

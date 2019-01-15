@@ -1,0 +1,29 @@
+package com.DAL;
+import java.sql.*;
+
+import com.Dao.*;
+
+public class UserService {
+	
+	/**
+	 * ≤È—Ø”√ªß√‹¬Î
+	 * @param id
+	 * @return Academy
+	 */
+	public String QueryUserReturnPassword(String username) {
+		String sql = "select Pass from UserLogin where Name=?";
+		Connection conn = SQLHelper.getConnection();
+		String password = "";
+		try{
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, username);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()){
+				password = rs.getString(1);
+			}
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}
+		return password;
+	}
+}

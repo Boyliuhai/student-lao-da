@@ -1,0 +1,186 @@
+package com.DAL;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.table.DefaultTableModel;
+
+import com.Dao.*;
+
+public class CourseService {
+	DBUtil db = new DBUtil();
+	/**
+	 * 修改课程信息
+	 * @param course
+	 * @return boolean
+	 */
+	public boolean ModefyCourse(CourseInfo course) {
+		String sql = "Update Course set CourseName=? where CourseId=?";
+		try{
+			db.update(sql, course.getCourseName(), course.getCourseId());
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}
+		return true;
+	}
+	
+	/**
+	 * 删除单条课程信息
+	 * @param courseId
+	 * @return boolean
+	 */
+	public boolean DeleteCourse(int courseId) {
+		String sql = "Delete From Course where CourseId=?";
+		try{
+			db.update(sql, courseId);
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}
+		return true;
+	}
+	
+	/**
+	 * 查询课程信息
+	 * @param courseid
+	 * @return Course
+	 */
+	public CourseInfo QueryCourse(int courseId) {
+		String sql = "Select * from Course where CourseId=?";
+		CourseInfo course = new CourseInfo();
+		try{
+			ResultSet rs = db.excuteQuery(sql, courseId);
+			if(rs.next()){
+				course.setCourseId(rs.getInt(1));
+				course.setCourseName(rs.getString(2));
+				course.setCoursePower(rs.getInt(3));
+				course.setCourseTime(rs.getString(4));
+				course.setLimit(rs.getInt(5));
+				course.setExists(rs.getInt(6));
+			}
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}finally{
+			db.close();
+		}
+		return course;
+	}
+
+	/**
+	 * 返回所有的课程名称
+	 * @return
+	 */
+	public List<String> getAllClassNames(){
+		String sql = "select CourseName from Course";
+		List<String> list = new ArrayList<String>();
+		try{
+			ResultSet rs = db.excuteQuery(sql);
+			while(rs.next()){
+				list.add(rs.getString(1));
+			}
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}finally{
+			db.close();
+		}
+		return list;
+	}
+	
+	/**
+	 * 添加课程信息
+	 * @param studentId
+	 * @param courseId
+	 * @param score
+	 * @return boolean
+	 */
+	public boolean AddScore(CourseInfo course) {
+		String sql = "insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) "
+				+ "values(?,?,?,?,?,?);";
+		try{
+			db.update(sql, course.getCourseId(), course.getCourseName(), course.getCoursePower(),
+					course.getCourseTime(),course.getExists(),course.getLimit());
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}
+		return true;
+	}
+	
+	/**
+	 * 根据学号返回已选的课程信息
+	 * @param stuId
+	 * @return
+	 */
+	public List<CourseInfo> getSelectingCourseInfoByProc(int stuId){
+		String sql = "exec proc_StuSelectedCourseInfo ?";
+		return getListByProc(sql, stuId);
+	}
+	
+	/**
+	 * 获取未选择课程信息列表
+	 * @param stuId
+	 * @return
+	 */
+	public List<CourseInfo> getCourseInfoByProc(int stuId){
+		String sql = "exec proc_StuSelectingCourseInfo ?";
+		return getListByProc(sql, stuId);
+	}
+	
+	/**
+	 * 获取课程列表
+	 * @param stuId
+	 * @return
+	 */
+	private List<CourseInfo> getListByProc(String sql, int stuId){
+		List<CourseInfo> ciList = new ArrayList<CourseInfo>();
+		try{
+			ResultSet rs = db.queryByProc(sql, stuId);
+			while(rs.next()){
+				CourseInfo ci = new CourseInfo();
+				for(int i=0;i<rs.getMetaData().getColumnCount();i++){
+					ci.setCourseId(rs.getInt(1));
+					ci.setCourseName(rs.getString(2));
+					ci.setCoursePower(rs.getInt(3));
+					ci.setCourseTime(rs.getString(4));
+					ci.setExists(rs.getInt(5));
+					ci.setLimit(rs.getInt(6));
+				}
+				ciList.add(ci);
+			}
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}finally{
+			db.close();
+		}
+		return ciList;
+	}
+	
+	/**
+	 * 通过学号获取未选修课程的DefaultTableModel
+	 * @param stuId
+	 * @return DefaultTableModel
+	 */
+	public DefaultTableModel getSelectingModelByStuId(int stuId){
+		String sql = "exec proc_StuSelectingCourseInfo ?";
+		return db.getModelByProc(sql, stuId);
+	}
+	
+	/**
+	 * 通过学号获取已选修课程的DefaultTableModel
+	 * @param stuId
+	 * @return DefaultTableModel
+	 */
+	public DefaultTableModel getSelectedModelByStuId(int stuId){
+		String sql = "exec proc_StuSelectedCourseInfo ?";
+		return db.getModelByProc(sql, stuId);
+	}
+	
+	/**
+	 * 选课
+	 * @return
+	 */
+	public boolean ChooseCourse(int stuId, int courseId){
+		String sql = "insert into ChooseCourse(StuId, CourseId) values(?,?)";
+		return db.update(sql, stuId, courseId);
+	}
+	
+	
+}

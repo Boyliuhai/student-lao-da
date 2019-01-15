@@ -1,0 +1,55 @@
+package com.UI.Admin;
+
+import java.awt.event.*;
+
+import javax.swing.*;
+
+@SuppressWarnings("serial")
+public class AdminHome extends JFrame implements ActionListener {
+	//全局变量
+	JRadioButton rbAcademyManagement = null;
+	JRadioButton rbStudentManagement = null;
+	JRadioButton rbCourseManagement = null;
+	JRadioButton rbTeacherManagement = null;
+	ButtonGroup bg = null;
+	JButton btnEnter = null;
+	
+	public AdminHome(){
+		init();
+	}
+	
+	public void init(){
+		//创建对象
+		rbAcademyManagement = new JRadioButton("学院信息管理");
+		rbStudentManagement = new JRadioButton("学生信息管理");
+		rbCourseManagement = new JRadioButton("课程信息管理");
+		rbTeacherManagement = new JRadioButton("教师信息管理");
+		bg = new ButtonGroup();
+		btnEnter = new JButton("进入");
+		JPanel p1 = new JPanel();
+		JPanel p2 = new JPanel();
+		JLabel lblMessage = new JLabel("管理员信息管理界面");
+		
+		//设置对象的属性
+		bg.add(rbAcademyManagement);
+		bg.add(rbTeacherManagement);
+		bg.add(rbStudentManagement);
+		bg.add(rbCourseManagement);
+		p1.add(lblMessage);
+		p2.add(rbAcademyManagement);
+		p2.add(rbTeacherManagement);
+		p2.add(rbStudentManagement);
+		p2.add(rbCourseManagement);
+		this.setTitle("管理员信息管理");
+		this.setSize(400,500);
+		
+		//显示
+		this.setVisible(true);
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		
+	}
+	
+}

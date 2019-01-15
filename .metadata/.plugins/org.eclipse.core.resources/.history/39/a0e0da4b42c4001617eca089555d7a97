@@ -1,0 +1,420 @@
+首先创建学生数据库STUDENT
+数据库连接的用户名和密码是sa和11170407
+use master;
+go
+create database STUDENT
+on primary
+(
+	name='STUDENT_DATA',
+	size=10MB,
+	filename='C:/STUDENT_DATA.mdf',
+	filegrouth=2MB
+)
+log on
+(
+	name='STUDENT_LOG',
+	size=2MB,
+	filename='C:/STUDENT_LOG.ldf',
+	filegrouth=1MB
+)
+go
+use STUDENT
+go
+/*==============================================================*/
+/* 初始化                                                       */
+/*==============================================================*/
+use STUDENT
+go
+if exists(select * from sysobjects where name='ChooseCourse')
+drop table ChooseCourse
+go
+if exists(select * from sysobjects where name='Student')
+drop table Student
+go
+if exists(select * from sysobjects where name='Teacher')
+drop table Teacher
+go
+if exists(select * from sysobjects where name='Academy')
+drop table Academy
+go
+if exists(select * from sysobjects where name='Course')
+drop table Course
+go
+if exists(select * from sysobjects where name='UserLogin')
+drop table UserLogin
+go
+
+/*==============================================================*/
+/* Table: Academy                                               */
+/*==============================================================*/
+create table Academy (
+   AcademyId            int                  not null,
+   AcademyName                 nvarchar(20)             null,
+   constraint PK_ACADEMY primary key nonclustered (AcademyId)
+)
+go
+
+/*==============================================================*/
+/* Table: Course                                                */
+/*==============================================================*/
+create table Course (
+   CourseId             int                  not null,
+   CourseName           nvarchar(20)             null,
+   CoursePower        int           null,
+   CourseTime            nvarchar(10)             null,
+   Limit                int             null,
+   Exist                int             null,
+   constraint PK_COURSE primary key nonclustered (CourseId)
+)
+go
+
+/*==============================================================*/
+/* Table: Student                                               */
+/*==============================================================*/
+create table Student (
+   StuId                int    identity(2014000, 1)           not null,
+   AcademyId            int              null,
+   StuName              nvarchar(20)             null,
+   StuSex               char(2)              null,
+   Birthday             datetime            null,
+   IdNo                 nvarchar(20)             null,
+   StudentImage         nvarchar(50)        null,
+   Instruction          nvarchar(500)            null,
+   constraint PK_STUDENT primary key nonclustered (StuId),
+   foreign key(AcademyId) references Academy(AcademyId)
+)
+go
+
+/*==============================================================*/
+/* Table: ChooseCourse                                          */
+/*==============================================================*/
+create table ChooseCourse (
+   CourseId             int                  not null,
+   StuId                int                  not null,
+   Score                int                  null,
+   constraint PK_CHOOSECOURSE primary key (CourseId, StuId),
+   foreign key(StuId) references Student(StuId),
+   foreign key(CourseId) references Course(CourseId)
+)
+go
+
+
+/*==============================================================*/
+/* Table: Teacher                                               */
+/*==============================================================*/
+create table Teacher (
+   TeachId              int                  not null,
+   AcademyId            int                  null,
+   TeacherName                 nvarchar(20)             null,
+   TeacherSex                  char(2)              null,
+   PhoneNumber          nvarchar(20)                  null,
+   constraint PK_TEACHER primary key nonclustered (TeachId),
+   foreign key(AcademyId) references Academy(AcademyId)
+)
+go
+
+/*==============================================================*/
+/* Table: UserLogin                                             */
+/*==============================================================*/
+create table UserLogin (
+   UserId                   int                  not null,
+   UserName                 char(20)             null,
+   UserPower            int                  null,
+   Password             char(20)             null,
+   constraint PK_USERLOGIN primary key nonclustered (UserId)
+)
+go
+
+
+
+--选课存储过程返回选课信息
+
+--已选课程列表
+if exists(select * from sysobjects where name='proc_StuSelectedCourseInfo')
+drop proc proc_StuSelectedCourseInfo
+go
+
+create proc proc_StuSelectedCourseInfo
+@stuId int
+as
+select c.CourseId as '课程编号', c.CourseName as '课程名称', c.CoursePower '学分', c.CourseTime as '上课时间', c.Exist as '已选人数', c.Limit as '最大人数'
+from ChooseCourse as cc
+inner join Student s on s.StuId=cc.StuId
+inner join Course c on cc.CourseId=c.CourseId 
+where cc.StuId=@stuId;
+go
+
+--测试
+--declare @stuId int
+--set @stuId=2014009;
+--exec proc_StuSelectedCourseInfo @stuId;
+--go
+
+----可选课程列表
+if exists(select * from sysobjects where name='proc_StuSelectingCourseInfo')
+drop proc proc_StuSelectingCourseInfo
+go
+
+create proc proc_StuSelectingCourseInfo
+@stuId int
+as
+select c.CourseId as '课程编号', c.CourseName as '课程名称', c.CoursePower '学分', c.CourseTime as '上课时间', c.Exist as '已选人数', c.Limit as '最大人数'
+from Course as c
+where c.CourseId in 
+(select c.CourseId from Course as c where c.CourseId 
+not in (select cc.CourseId from ChooseCourse as cc where cc.StuId=@stuId))
+go
+
+--测试查询未选修课程
+--declare @stuId int
+--set @stuId=2014009
+--exec proc_StuSelectingCourseInfo @stuId
+--go
+
+--测试查询未选修课程信息中的方法
+--declare @stuId int
+--set @stuId=2014005
+--select c.CourseId as '课程号', c.CourseName as '课程名', c.Exist as '已选人数', c.Limit as '限选人数' 
+--from Course as c
+--where c.CourseId in 
+--(select c.CourseId from Course as c where c.CourseId 
+--not in (select cc.CourseId from ChooseCourse as cc where cc.StuId=@stuId))
+--go
+
+--删除学生基本信息以及与该学生关联的选课信息，实现选课人数的统计。
+--查看所有课程表信息
+--truncate table ChooseCourse;--清空选课
+--update Course set Exist=0;--设置选课人数为空
+--select * from Course;
+--select * from ChooseCourse;
+
+--选课触发器
+if exists(select * from sysobjects where name='tri_Selecting')
+drop trigger tri_Selecting
+go
+
+create trigger tri_Selecting
+on ChooseCourse 
+for insert
+as
+declare @count int
+declare @currentCount int
+declare @limit int
+select @count=COUNT(*) from inserted
+select @currentCount=Course.Exist from Course
+select @limit=Course.Limit from Course
+if @limit<@count+@currentCount--超过限制人数
+rollback;--回滚
+update Course set Exist=Exist+@count where CourseId=(select CourseId from inserted);
+go
+
+--测试
+--insert into ChooseCourse(CourseId,StuId) values(5,2014009);
+--insert into ChooseCourse(CourseId,StuId) values(5,2014019);
+--显示
+--select * from Course;
+--select * from ChooseCourse;
+--go
+
+--退选课程触发器
+if exists(select * from sysobjects where name='tri_QuitCourse')
+drop trigger tri_QuitCourse
+go
+
+create trigger tri_QuitCourse
+on ChooseCourse
+for delete
+as
+declare @currentCount int
+declare @courseId int
+select @courseId=CourseId from deleted;
+select @currentCount=Course.Exist from Course where CourseId=@courseId;
+set @currentCount=@currentCount-@@ROWCOUNT;--要删除的行数
+if @currentCount<0--超过限制人数
+begin
+	print '错误'
+	rollback;
+end
+update Course set Exist=@currentCount where CourseId=@courseId;
+go
+
+--添加学生用户信息触发器
+if exists(select * from sysobjects where name='tri_AddStudentUser')
+drop trigger tri_AddStudentUser
+go
+
+create trigger tri_AddStudentUser
+on Student
+for insert
+as
+declare @userId int
+declare @userName nvarchar(20)
+select @userId=StuId,@userName=StuName from inserted;
+insert into UserLogin(UserId,UserName,UserPower,Password) values(@userId,@userName,3,'123456');--学生初始密码为123456
+go
+
+
+--删除学生用户信息触发器
+if exists(select * from sysobjects where name='tri_DeleteStudentUser')
+drop trigger tri_DeleteStudentUser
+go
+
+create trigger tri_DeleteStudentUser
+on Student
+for delete
+as
+declare @userId int
+select @userId=StuId from deleted;
+delete UserLogin where UserId=@userId;
+go
+
+--添加教师用户信息触发器
+if exists(select * from sysobjects where name='tri_AddTeacherUser')
+drop trigger tri_AddTeacherUser
+go
+
+create trigger tri_AddTeacherUser
+on Teacher
+for insert
+as
+declare @userId int
+declare @userName nvarchar(20)
+select @userId=TeachId,@userName=TeacherName from inserted;
+insert into UserLogin(UserId,UserName,UserPower,Password) values(@userId,@userName,2,'123456');--老师用户的初始密码为123456
+go
+
+
+--删除教师用户信息触发器
+if exists(select * from sysobjects where name='tri_DeleteTeacherUser')
+drop trigger tri_DeleteTeacherUser
+go
+
+create trigger tri_DeleteTeacherUser
+on Teacher
+for delete
+as
+declare @userId int
+select @userId=TeachId from deleted;
+delete UserLogin where UserId=@userId;
+go
+
+--测试
+--delete ChooseCourse where StuId=2014019 and CourseId=5;
+--delete ChooseCourse where StuId=2014009 and CourseId=5;
+--显示
+--select * from Course;
+--select * from ChooseCourse;
+
+--加入数据
+insert into Academy(AcademyId,AcademyName) values(1,'计算机科学学院');
+insert into Academy(AcademyId,AcademyName) values(2,'生命科学学院');
+insert into Academy(AcademyId,AcademyName) values(3,'数学院');
+insert into Academy(AcademyId,AcademyName) values(4,'化学环境与工程学院');
+insert into Academy(AcademyId,AcademyName) values(5,'外国语学院');
+insert into Academy(AcademyId,AcademyName) values(6,'机械学院');
+insert into Academy(AcademyId,AcademyName) values(7,'农学院');
+
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('张玲','F','1','412824196624541245','我是张龄','img/01.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('刘丽','F','1','412824196624541245','我是刘丽','img/02.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('赵柳','M','1','412824196624541245','我是赵柳','img/03.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('田琦','F','5','412824196624541245','我是田琦','img/05.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('刘帅','F','1','412824196624541245','我是刘帅','img/04.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('张爽','F','1','412824196624541245','我是张爽','img/01.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('程输','M','6','412824196624541245','我是程输','img/09.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('白峰','M','1','412824196624541245','我是白峰','img/10.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('刘世凯','M','1','412824196624541245','我是刘世凯','img/11.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('袁绍','M','1','412824196624541245','我是袁绍','img/01.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('刘伶','F','2','412824196624541245','我是刘伶','img/01.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('张红','F','4','412824196624541245','我是张红','img/07.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('刘海','M','1','412824196624541245','我是刘海','img/13.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('李大海','M','1','412824196624541245','我是李大海','img/15.jpg');
+
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('李奥','M','1','412824196624541245','我是李奥','img/16.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('常海','M','1','412824196624541245','我是常海','img/18.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('拓海','M','1','412824196624541245','我是拓海','img/19.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('袁梦婷','F','5','412824196624541245','我是袁梦婷','img/21.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('刘庆东','M','1','412824196624541245','我是刘庆东','img/20.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('吴贵','M','1','412824196624541245','我是吴贵','img/22.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('肖奈','M','6','412824196624541245','我是肖奈','img/24.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('雷峰','M','1','412824196624541245','我是雷峰','img/26.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('刘凯','M','1','412824196624541245','我是刘凯','img/28.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('袁忠','M','1','412824196624541245','我是袁忠','img/25.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('李世','M','2','412824196624541245','我是李世','img/27.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('张可心','F','4','412824196624541245','我是张可心','img/30.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('刘发生','M','1','412824196624541245','我是刘发生','img/32.jpg');
+insert into Student(StuName,StuSex,AcademyId,IdNo,Instruction,StudentImage) values('李恋','F','1','412824196624541245','我是李恋','img/31.jpg');
+--统一设置生日为当前系统时间
+update Student set Birthday=GETDATE();
+
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(1,'WEB程序设计',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(2,'Java程序设计',2.5,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(3,'计算机组成原理',3,'3-18',120,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(4,'大数据',3,'1-16',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(5,'计算机网络',3,'1-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(6,'网站设计',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(7,'设计模式',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(8,'数值分析',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(9,'Matlab程序设计',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(10,'多媒体技术',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(11,'通信',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(12,'软件工程',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(13,'架构设计基础',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(14,'UML系统分析设计',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(15,'C#高级编程',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(16,'算法导论',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(17,'高等数学',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(18,'线性代数',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(19,'概率论与数理统计',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(20,'数据结构',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(21,'微机原理',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(22,'C++程序设计',3,'3-18',150,0);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(23,'面向对象',3,'3-18',150,5);
+insert into Course(CourseId,CourseName,CoursePower,CourseTime,Limit,Exist) values(24,'移动开发',3,'3-18',150,0);
+
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95001,'林莉','F',5,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95002,'肖科','M',1,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95003,'李芬','F',6,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95004,'方琴','F',5,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95005,'李刚','M',2,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95006,'肖静','F',5,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95007,'林华','M',1,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95008,'李磊','M',6,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95009,'谢明','M',5,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95010,'李保诚','M',2,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95011,'戴中','M',5,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95012,'梁老','M',1,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95013,'李少白','M',6,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95014,'方小倩','F',5,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95015,'赵静','F',2,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95016,'刘发','F',5,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95017,'李晶','F',1,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95018,'邦旭','M',6,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95019,'关亿','M',5,'15467813487');
+insert into Teacher(TeachId,TeacherName,TeacherSex,AcademyId,PhoneNumber) values(95020,'韩向东','M',2,'15467813487');
+
+insert into UserLogin(UserId,UserName,UserPower,Password) values(1001,'zhangsan',1,'123456');
+insert into UserLogin(UserId,UserName,UserPower,Password) values(1002,'lisi',1,'123456');
+insert into UserLogin(UserId,UserName,UserPower,Password) values(1003,'wangwu',1,'123456');
+insert into UserLogin(UserId,UserName,UserPower,Password) values(1004,'zhaoliu',1,'123456');
+
+insert into ChooseCourse(StuId,CourseId,Score) values(2014001,1,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014001,5,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014001,15,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014001,6,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014001,4,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014001,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014005,6,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014008,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014002,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014005,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014007,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014011,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014012,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014013,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014014,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014015,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014016,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014017,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014018,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014019,2,RAND()*100);
+insert into ChooseCourse(StuId,CourseId,Score) values(2014020,2,RAND()*100);

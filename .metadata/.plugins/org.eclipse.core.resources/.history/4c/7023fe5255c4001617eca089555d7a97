@@ -1,0 +1,42 @@
+package com.UI.Admin;
+
+import java.awt.GridLayout;
+import javax.swing.*;
+import com.DAL.*;
+
+@SuppressWarnings("serial")
+public class CourseGradeInfo extends JFrame {
+	//教师服务类
+	TeacherService ts = new TeacherService();
+	//添加学院服务类
+	AcademyService as = new AcademyService();
+	public void init() {
+		//创建对象
+		JFrame addAcademy = new JFrame();
+		JLabel lblMessage = new JLabel("添加学院信息");
+		JLabel lblAcademyName = new JLabel("学院名称：");
+		JTextField txtAcademyName = new JTextField();
+		JButton btnAddAcademyInfo = new JButton("添加");
+		JButton btnClear = new JButton("清除");
+		
+		//设置属性
+		addAcademy.setSize(500, 400);
+		addAcademy.setLocation(650, 300);
+		addAcademy.setLayout(new GridLayout(4,4));
+		addAcademy.setResizable(false);
+		btnAddAcademyInfo.setSize(100, 30);
+		btnClear.setSize(100, 30);
+		btnAddAcademyInfo.setLocation(100, 50);
+		btnClear.setLocation(100, 100);
+		
+		//添加
+		addAcademy.add(lblMessage);
+		addAcademy.add(lblAcademyName);
+		addAcademy.add(txtAcademyName);
+		addAcademy.add(btnAddAcademyInfo);
+		addAcademy.add(btnClear);
+		
+		//显示
+		addAcademy.setVisible(true);
+	}
+}
